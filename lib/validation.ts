@@ -213,7 +213,7 @@ export async function validateAndSanitize<T>(
     const result = await schema.safeParseAsync(data)
 
     if (!result.success) {
-      const errors = result.error.errors.map(err =>
+      const errors = result.error.issues.map(err =>
         `${err.path.join('.')}: ${err.message}`
       )
       return { success: false, errors }
