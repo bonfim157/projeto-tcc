@@ -3,78 +3,93 @@
     {
       "id": "34066265-3e98-44dc-9bb2-b7382f9c9371",
       "login": "prof.rafael",
-      "senha": "$2b$10$A00lpdd2HjeFETS.NUkobeYsQ9yTmGe8M.CloxlNnXbtsXotWnQoS",
+      "senha_hash": "$2b$10$A00lpdd2HjeFETS.NUkobeYsQ9yTmGe8M.CloxlNnXbtsXotWnQoS",
       "nome": "Rafael F. Bonfim",
-      "papel": "professor",
-      "initials": "RF",
-      "escola": "ETEC Zona Sul",
-      "criadoEm": "2026-06-25T18:36:21.698Z"
+      "papel": "professor"
     },
     {
       "id": "c3d23baf-abe0-4ce1-a430-236a8ac55505",
       "login": "aluno.joao",
-      "senha": "$2b$10$Z193uBsa6fF791NCK6nageXXScmfpOGOVc7GVEqSgNgzcOp4wfuhi",
+      "senha_hash": "$2b$10$Z193uBsa6fF791NCK6nageXXScmfpOGOVc7GVEqSgNgzcOp4wfuhi",
       "nome": "João P. Silva",
-      "papel": "aluno",
-      "initials": "JS",
-      "ra": "2024001",
-      "turma": "3º Ano TI",
-      "criadoEm": "2026-06-25T18:36:21.699Z"
+      "papel": "aluno"
     },
     {
       "id": "f2ba588e-8d96-415b-b82e-e941a2267b58",
       "login": "gestao.escola",
-      "senha": "$2b$10$H2Qg/bcJmAPnGUXSTj9cM.r0EkMdHmL6//IC29m1xhAqjET/ludTO",
+      "senha_hash": "$2b$10$H2Qg/bcJmAPnGUXSTj9cM.r0EkMdHmL6//IC29m1xhAqjET/ludTO",
       "nome": "Maria S. Costa",
-      "papel": "gestao",
-      "initials": "MC",
-      "cargo": "Coordenadora Pedagógica",
-      "criadoEm": "2026-06-25T18:36:21.699Z"
+      "papel": "gestao"
     }
   ],
   "events": [
     {
       "id": "125783a4-2f4e-4aad-a8ec-b5c3387fa67f",
-      "date": "2026-03-22",
+      "date": "2026-09-22",
       "title": "Reunião de Pais",
-      "cat": "red",
+      "category": "red",
       "status": "approved",
       "nota": "Sala dos professores, 19h",
-      "autor": "prof.rafael"
+      "autor_login": "prof.rafael"
     },
     {
       "id": "7307dc6d-42bc-4870-bc1e-98211c7bef50",
-      "date": "2026-03-25",
+      "date": "2026-09-25",
       "title": "Prova de Matemática",
-      "cat": "yellow",
+      "category": "yellow",
       "status": "approved",
       "nota": "3º Ano TI – Cap. 4",
-      "autor": "prof.rafael"
+      "autor_login": "prof.rafael"
     },
     {
       "id": "683c03be-1945-48c9-a95e-6d7a6e2c3bf4",
-      "date": "2026-04-05",
+      "date": "2026-09-30",
       "title": "Gincana Escolar",
-      "cat": "purple",
+      "category": "purple",
       "status": "pending",
       "nota": "Aguardando confirmação do espaço",
-      "autor": "prof.rafael"
+      "autor_login": "prof.rafael"
+    },
+    {
+      "id": "a1b2c3d4-0000-0000-0000-000000000001",
+      "date": "2026-10-05",
+      "title": "Semana de Provas",
+      "category": "yellow",
+      "status": "approved",
+      "nota": null,
+      "autor_login": "gestao.escola"
+    },
+    {
+      "id": "a1b2c3d4-0000-0000-0000-000000000002",
+      "date": "2026-10-12",
+      "title": "Feriado Nacional",
+      "category": "blue",
+      "status": "approved",
+      "nota": "Feriado de Nossa Senhora Aparecida",
+      "autor_login": "gestao.escola"
+    },
+    {
+      "id": "a1b2c3d4-0000-0000-0000-000000000003",
+      "date": "2026-10-20",
+      "title": "Atividade de Campo",
+      "category": "green",
+      "status": "approved",
+      "nota": "3º Ano TI",
+      "autor_login": "prof.rafael"
     }
   ],
   "messages": [
     {
       "id": "e2643f02-b9a0-421d-93e0-b9bdba9fff19",
-      "from": "gestao.escola",
-      "to": "prof.rafael",
+      "from_login": "gestao.escola",
       "text": "Precisamos alinhar a gincana",
-      "createdAt": "2026-06-25T18:36:21.699Z"
+      "created_at": "2026-09-11T18:00:00.000Z"
     },
     {
       "id": "97f1c574-b065-4281-abd0-0a36ffc3d99d",
-      "text": "Olá equipe, teste de chat",
-      "from": "aluno.joao",
-      "to": null,
-      "createdAt": "2026-06-25T18:39:19.848Z"
+      "from_login": "aluno.joao",
+      "text": "Olá equipe, teste de chat!",
+      "created_at": "2026-09-11T18:05:00.000Z"
     }
   ],
   "schedules": [
@@ -83,8 +98,35 @@
       "turma": "3º Ano TI",
       "dia": 1,
       "slot": 1,
-      "disciplina": "Programação Mobile",
-      "professor": "prof.rafael"
+      "disciplina": "Programação Mobile"
+    },
+    {
+      "id": "dbc98b58-0386-4620-a6cb-c90c9bc81538",
+      "turma": "3º Ano TI",
+      "dia": 1,
+      "slot": 2,
+      "disciplina": "Banco de Dados"
+    },
+    {
+      "id": "dbc98b58-0386-4620-a6cb-c90c9bc81539",
+      "turma": "3º Ano TI",
+      "dia": 3,
+      "slot": 1,
+      "disciplina": "Redes de Computadores"
+    },
+    {
+      "id": "dbc98b58-0386-4620-a6cb-c90c9bc81540",
+      "turma": "2º Ano TI",
+      "dia": 2,
+      "slot": 1,
+      "disciplina": "Lógica de Programação"
+    },
+    {
+      "id": "dbc98b58-0386-4620-a6cb-c90c9bc81541",
+      "turma": "2º Ano TI",
+      "dia": 4,
+      "slot": 2,
+      "disciplina": "Matemática Aplicada"
     }
   ]
 }

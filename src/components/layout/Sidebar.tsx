@@ -1,7 +1,7 @@
 'use client'
 // ─────────────────────────────────────────────
 //  Sidebar — navegação lateral
-//  Desktop: estática | Mobile: drawer deslizante
+//  Desktop: static (fluxo normal) | Mobile: drawer fixed
 // ─────────────────────────────────────────────
 import { useRouter } from 'next/navigation'
 import { useShell } from './Shell'
@@ -10,12 +10,11 @@ import type { User } from '@/src/types'
 // ── Dados de navegação ────────────────────────
 const NAV_BASE = [
   { icon: '🗓️', label: 'Calendário', href: '/dashboard' },
-  { icon: '📋', label: 'Eventos',    href: '/dashboard?view=eventos' },
   { icon: '💬', label: 'Chat',       href: '/dashboard?view=chat' },
   { icon: '📊', label: 'Horários',   href: '/dashboard?view=horarios' },
 ] as const
 
-const NAV_GESTAO = { icon: '📈', label: 'Métricas', href: '/dashboard?view=metricas' } as const
+const NAV_GESTAO = { icon: '⏳', label: 'Aprovações', href: '/dashboard?view=aprovacoes' } as const
 
 const PAPEL_LABEL: Record<string, string> = {
   professor: 'Professor',
@@ -47,20 +46,70 @@ export default function Sidebar({ user, activeView, onLogout }: Props) {
   }
 
   return (
-    <aside
-      className={[
-        'flex flex-col w-64 shrink-0 h-full text-white z-50',
-        // Mobile: drawer controlado pelo ShellContext
-        'fixed inset-y-0 left-0 transition-transform duration-300',
-        drawerOpen ? 'translate-x-0' : '-translate-x-full',
-        // Desktop: sempre visível
-        'md:relative md:translate-x-0',
-      ].join(' ')}
-      style={{ background: 'var(--accent)' }}
-      aria-label="Menu de navegação"
-    >
-      {/* ── Brand ── */}
-      <div className="px-5 pt-5 pb-4 border-b border-white/10 flex items-center justify-between">
+    <>
+      {/* ── Desktop: sidebar estática no fluxo normal ── */}
+      <aside
+        className="hidden md:flex flex-col w-64 shrink-0 h-full text-white z-10"
+        style={{ background: 'var(--accent)' }}
+        aria-label="Menu de navegação"
+      >
+        <SidebarContent
+          user={user}
+          initials={initials}
+          navItems={navItems}
+          activeView={activeView}
+          navigate={navigate}
+          onLogout={onLogout}
+          showClose={false}
+          onClose={closeDrawer}
+        />
+      </aside>
+
+      {/* ── Mobile: drawer fixed que desliza da esquerda ── */}
+      <aside
+        className={[
+          'md:hidden flex flex-col w-64 shrink-0 h-full text-white z-50',
+          'fixed inset-y-0 left-0 transition-transform duration-300 ease-material',
+          drawerOpen ? 'translate-x-0' : '-translate-x-full',
+        ].join(' ')}
+        style={{ background: 'var(--accent)' }}
+        aria-label="Menu de navegação"
+        aria-hidden={!drawerOpen}
+      >
+        <SidebarContent
+          user={user}
+          initials={initials}
+          navItems={navItems}
+          activeView={activeView}
+          navigate={navigate}
+          onLogout={onLogout}
+          showClose
+          onClose={closeDrawer}
+        />
+      </aside>
+    </>
+  )
+}
+
+// ── Conteúdo compartilhado ──────────────────
+interface ContentProps {
+  user: User | null
+  initials: string
+  navItems: readonly { icon: string; label: string; href: string }[]
+  activeView?: string
+  navigate: (href: string) => void
+  onLogout: () => void
+  showClose: boolean
+  onClose: () => void
+}
+
+function SidebarContent({
+  user, initials, navItems, activeView, navigate, onLogout, showClose, onClose,
+}: ContentProps) {
+  return (
+    <>
+      {/* Brand */}
+      <div className="px-5 pt-5 pb-4 border-b border-white/10 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
           <span className="text-2xl" aria-hidden="true">📚</span>
           <div>
@@ -68,19 +117,20 @@ export default function Sidebar({ user, activeView, onLogout }: Props) {
             <div className="text-white/35 text-[11px]">Portal Escolar</div>
           </div>
         </div>
-        {/* Fechar no mobile */}
-        <button
-          onClick={closeDrawer}
-          className="md:hidden w-8 h-8 flex items-center justify-center rounded-lg
-                     text-white/60 hover:text-white hover:bg-white/10 transition-colors"
-          aria-label="Fechar menu"
-        >
-          ✕
-        </button>
+        {showClose && (
+          <button
+            onClick={onClose}
+            className="w-8 h-8 flex items-center justify-center rounded-lg
+                       text-white/60 hover:text-white hover:bg-white/10 transition-colors"
+            aria-label="Fechar menu"
+          >
+            ✕
+          </button>
+        )}
       </div>
 
-      {/* ── Usuário ── */}
-      <div className="px-5 py-4 border-b border-white/10">
+      {/* Usuário */}
+      <div className="px-5 py-4 border-b border-white/10 shrink-0">
         <div className="flex items-center gap-3">
           <div
             className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shrink-0"
@@ -98,16 +148,15 @@ export default function Sidebar({ user, activeView, onLogout }: Props) {
           <div
             className="ml-auto w-2 h-2 rounded-full bg-emerald-400 shrink-0"
             title="Online"
-            aria-label="Online"
           />
         </div>
       </div>
 
-      {/* ── Navegação ── */}
+      {/* Navegação */}
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto" aria-label="Principal">
         {navItems.map((item, idx) => {
           const isActive = activeView
-            ? item.href.includes(activeView)
+            ? item.href.includes(`view=${activeView}`)
             : item.href === '/dashboard'
 
           return (
@@ -117,7 +166,8 @@ export default function Sidebar({ user, activeView, onLogout }: Props) {
               className="w-full flex items-center gap-3 px-3 rounded-xl text-sm font-medium
                          transition-all duration-150 text-left
                          hover:bg-white/15 active:scale-95
-                         focus:outline-none focus:ring-2 focus:ring-white/40"
+                         focus:outline-none focus:ring-2 focus:ring-white/40
+                         animate-stagger"
               style={{
                 minHeight: '44px',
                 background: isActive ? 'rgba(255,255,255,0.15)' : 'transparent',
@@ -133,8 +183,8 @@ export default function Sidebar({ user, activeView, onLogout }: Props) {
         })}
       </nav>
 
-      {/* ── Logout ── */}
-      <div className="px-3 pb-5 pt-3 border-t border-white/10">
+      {/* Logout */}
+      <div className="px-3 pb-5 pt-3 border-t border-white/10 shrink-0">
         <button
           onClick={onLogout}
           className="w-full flex items-center gap-3 px-3 rounded-xl text-sm font-medium
@@ -146,6 +196,6 @@ export default function Sidebar({ user, activeView, onLogout }: Props) {
           <span>Sair</span>
         </button>
       </div>
-    </aside>
+    </>
   )
 }

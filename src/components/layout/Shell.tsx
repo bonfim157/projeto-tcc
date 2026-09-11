@@ -1,7 +1,8 @@
 'use client'
 // ─────────────────────────────────────────────
 //  Shell — wrapper principal do layout
-//  Gerencia o estado do drawer mobile via Context
+//  Aplica data-role no container para ativar
+//  o tema de acento correto via CSS custom props
 // ─────────────────────────────────────────────
 import { createContext, useContext, useState } from 'react'
 import type { Papel } from '@/src/types'
@@ -29,7 +30,7 @@ interface Props {
   role?: Papel
 }
 
-export default function Shell({ children }: Props) {
+export default function Shell({ children, role }: Props) {
   const [drawerOpen, setDrawerOpen] = useState(false)
 
   return (
@@ -40,7 +41,7 @@ export default function Shell({ children }: Props) {
         closeDrawer: () => setDrawerOpen(false),
       }}
     >
-      {/* Overlay mobile */}
+      {/* Overlay mobile do drawer da sidebar */}
       {drawerOpen && (
         <div
           className="fixed inset-0 z-40 bg-black/50 md:hidden animate-fadeIn"
@@ -49,7 +50,11 @@ export default function Shell({ children }: Props) {
         />
       )}
 
-      <div className="flex h-screen overflow-hidden bg-slate-50">
+      {/* data-role ativa as CSS custom properties de --accent no globals.css */}
+      <div
+        className="flex h-screen overflow-hidden bg-slate-50"
+        data-role={role ?? undefined}
+      >
         {children}
       </div>
     </ShellContext.Provider>

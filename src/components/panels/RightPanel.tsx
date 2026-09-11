@@ -35,7 +35,9 @@ export default function RightPanel({ user, events, onRefresh }: Props) {
   }, [])
 
   const upcoming = [...events]
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .filter(ev => user?.papel === 'aluno' ? ev.status === 'approved' : true)
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+    .filter(ev => ev.date >= new Date().toISOString().slice(0, 10))
     .slice(0, 5)
 
   const content = (
@@ -104,7 +106,9 @@ export default function RightPanel({ user, events, onRefresh }: Props) {
             <ChatPanel user={user} />
           </>
         ) : (
-          <ScheduleView schedules={schedules} />
+          <ScheduleView schedules={schedules} user={user} onRefresh={() =>
+            scheduleApi.list().then(r => setSchedules(r.schedules ?? [])).catch(() => {})
+          } />
         )}
       </div>
     </>
@@ -133,29 +137,35 @@ export default function RightPanel({ user, events, onRefresh }: Props) {
 
         {mobileOpen && (
           <>
+            {/* Overlay */}
             <div
               className="fixed inset-0 z-40 bg-black/40 animate-fadeIn"
               onClick={() => setMobileOpen(false)}
               aria-hidden="true"
             />
+            {/* Bottom-sheet com slideInUp */}
             <div
               className="fixed bottom-0 left-0 right-0 z-50 flex flex-col
-                         bg-slate-50 rounded-t-2xl shadow-[0_-4px_24px_rgba(0,0,0,0.15)]"
+                         bg-slate-50 rounded-t-2xl shadow-[0_-4px_24px_rgba(0,0,0,0.15)]
+                         animate-slideInUp"
               style={{ maxHeight: '80vh' }}
               role="dialog"
               aria-modal="true"
               aria-label="Painel lateral"
             >
-              <div className="flex items-center justify-between px-4 pt-3 pb-1 shrink-0">
-                <div className="w-10 h-1 rounded-full bg-slate-300 mx-auto" />
-                <button
-                  onClick={() => setMobileOpen(false)}
-                  className="w-8 h-8 flex items-center justify-center rounded-full
-                             text-slate-400 hover:bg-slate-200 transition-colors ml-auto"
-                  aria-label="Fechar painel"
-                >
-                  ✕
-                </button>
+              {/* Handle visual de arraste */}
+              <div className="flex flex-col items-center px-4 pt-3 pb-1 shrink-0">
+                <div className="w-10 h-1 rounded-full bg-slate-300 mb-2" />
+                <div className="w-full flex justify-end">
+                  <button
+                    onClick={() => setMobileOpen(false)}
+                    className="w-8 h-8 flex items-center justify-center rounded-full
+                               text-slate-400 hover:bg-slate-200 transition-colors"
+                    aria-label="Fechar painel"
+                  >
+                    ✕
+                  </button>
+                </div>
               </div>
               {content}
             </div>
@@ -167,13 +177,26 @@ export default function RightPanel({ user, events, onRefresh }: Props) {
 }
 
 // ── Horários ──────────────────────────────────
-function ScheduleView({ schedules }: { schedules: Schedule[] }) {
+function ScheduleView({
+  schedules,
+  user,
+}: {
+  schedules: Schedule[]
+  user: User | null
+  onRefresh: () => void
+}) {
   const DIAS = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado']
 
   if (schedules.length === 0) {
     return (
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
-        <p className="text-xs text-slate-400 text-center">Nenhum horário cadastrado.</p>
+      <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 text-center">
+        <span className="text-2xl mb-2 block" aria-hidden="true">📊</span>
+        <p className="text-xs text-slate-400">Nenhum horário cadastrado.</p>
+        {user?.papel === 'gestao' && (
+          <p className="text-[11px] text-slate-300 mt-1">
+            Adicione horários pelo painel de gestão.
+          </p>
+        )}
       </div>
     )
   }
@@ -187,15 +210,18 @@ function ScheduleView({ schedules }: { schedules: Schedule[] }) {
     <div className="space-y-3">
       {Object.entries(byTurma).map(([turma, items]) => (
         <div key={turma} className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100">
-          <h4 className="font-bold text-sm text-slate-800 mb-3">{turma}</h4>
+          <h4 className="font-bold text-sm text-slate-800 mb-3 flex items-center gap-2">
+            <span aria-hidden="true">🏫</span>
+            {turma}
+          </h4>
           <ul className="space-y-1.5">
             {items
               .sort((a, b) => a.dia - b.dia || a.slot - b.slot)
               .map(s => (
                 <li key={s.id} className="flex items-center gap-2 text-xs text-slate-600">
-                  <span className="font-semibold w-16 text-slate-400">{DIAS[s.dia]}</span>
-                  <span className="bg-slate-100 rounded px-2 py-0.5">{s.slot}º</span>
-                  <span>{s.disciplina}</span>
+                  <span className="font-semibold w-16 text-slate-400 shrink-0">{DIAS[s.dia]}</span>
+                  <span className="bg-slate-100 rounded px-2 py-0.5 shrink-0">{s.slot}º</span>
+                  <span className="truncate">{s.disciplina}</span>
                 </li>
               ))}
           </ul>

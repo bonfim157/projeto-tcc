@@ -3,15 +3,17 @@ import { isConfigured, db } from '@/lib/supabase'
 import { EventSchema } from '@/lib/validation'
 import getDB, { type DBEvent } from '@/lib/db'
 
-function normalizeEvent(ev: DBEvent) {
+// Normaliza evento do DB para o formato esperado pelo cliente.
+// Compatível com campos legados (cat, autor) e campos novos (category, autor_login).
+function normalizeEvent(ev: DBEvent & Record<string, unknown>) {
   return {
     id:          ev.id,
     date:        ev.date,
     title:       ev.title,
-    category:    ev.category ?? 'blue',
+    category:    (ev.category ?? ev['cat'] ?? 'blue') as string,
     status:      ev.status ?? 'pending',
     nota:        ev.nota ?? null,
-    autor_login: ev.autor_login ?? null,
+    autor_login: (ev.autor_login ?? ev['autor'] ?? null) as string | null,
   }
 }
 
@@ -26,7 +28,8 @@ export async function GET() {
   }
 
   const local = await getDB()
-  const events = (local.data.events ?? []).map(normalizeEvent)
+  const events = (local.data.events ?? [])
+    .map(ev => normalizeEvent(ev as DBEvent & Record<string, unknown>))
     .sort((a, b) => a.date.localeCompare(b.date))
   return NextResponse.json({ events })
 }
@@ -64,7 +67,7 @@ export async function POST(req: Request) {
     }
     local.data.events.push(newEvent)
     await local.write()
-    return NextResponse.json({ ok: true, event: newEvent })
+    return NextResponse.json({ ok: true, event: normalizeEvent(newEvent) })
   } catch {
     return NextResponse.json({ erro: 'Erro ao criar evento' }, { status: 500 })
   }
