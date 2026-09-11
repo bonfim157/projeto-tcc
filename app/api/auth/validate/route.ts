@@ -1,26 +1,38 @@
-import { NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
+import { NextResponse } from 'next/server'
+import jwt from 'jsonwebtoken'
 
-const SECRET = process.env.JWT_SECRET
-if (!SECRET) {
-  console.error('❌ JWT_SECRET não configurado. Configure a variável de ambiente JWT_SECRET.')
-  if (process.env.NODE_ENV === 'development') {
-    console.warn('⚠️  Usando fallback para desenvolvimento APENAS. NUNCA use em produção.')
-  } else {
-    throw new Error('JWT_SECRET não configurado para produção')
+// Compartilha a mesma lógica de obter o secret que auth/login
+function getJwtSecret(): string {
+  const secret = process.env.JWT_SECRET
+  if (!secret) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('JWT_SECRET não configurado para produção')
+    }
+    return 'dev_secret_change_me_minimum_32_chars'
   }
+  return secret
 }
-
-const SECRET_TO_USE = SECRET || (process.env.NODE_ENV === 'development' ? 'dev_secret_change_me_temp_only' : '')
 
 export async function GET(req: Request) {
   try {
-    const cookie = req.headers.get('cookie') || '';
-    const token = cookie.split(';').map(s=>s.trim()).find(s=>s.startsWith('token='))?.split('=')[1];
-    if(!token) return NextResponse.json({ ok: false }, { status: 401 });
-    const payload = jwt.verify(token, SECRET_TO_USE) as any;
-    return NextResponse.json({ ok: true, user: payload });
-  } catch (err) {
-    return NextResponse.json({ ok: false }, { status: 401 });
+    const cookie = req.headers.get('cookie') ?? ''
+    const token  = cookie
+      .split(';')
+      .map(s => s.trim())
+      .find(s => s.startsWith('token='))
+      ?.slice('token='.length)
+
+    if (!token) return NextResponse.json({ ok: false }, { status: 401 })
+
+    const payload = jwt.verify(token, getJwtSecret()) as {
+      login: string; papel: string; nome: string
+    }
+
+    return NextResponse.json({
+      ok: true,
+      user: { login: payload.login, nome: payload.nome, papel: payload.papel },
+    })
+  } catch {
+    return NextResponse.json({ ok: false }, { status: 401 })
   }
 }

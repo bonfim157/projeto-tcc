@@ -1,61 +1,53 @@
 'use client'
-
+// ─────────────────────────────────────────────
+//  Login — seleção de perfil + formulário
+// ─────────────────────────────────────────────
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useAuth } from '@/src/hooks/useAuth'
+import type { Papel } from '@/src/types'
 
-type Papel = 'professor' | 'gestao' | 'aluno'
-
-const BG_SELECTOR = '#08090c'
-
+// ── Temas por papel ───────────────────────────
 const THEMES = {
   professor: {
-    bg:          '#0d1117',
-    accent:      '#1e3a8a',
-    label:       'Professor',
-    sublabel:    'Acesso para Docentes e Educadores',
-    hint:        'Use as credenciais fornecidas pela instituição.',
-    demoLogin:   'prof.rafael',
-    demoSenha:   'prof123',
-    professional: true,
+    bg:       '#0d1117',
+    accent:   '#1e3a8a',
+    label:    'Professor',
+    sublabel: 'Acesso para Docentes e Educadores',
+    hint:     'Use as credenciais fornecidas pela instituição.',
+    demo:     { login: 'prof.rafael', senha: 'prof123' },
   },
   gestao: {
-    bg:          '#0b0618',
-    accent:      '#4c1d95',
-    label:       'Gestão',
-    sublabel:    'Acesso Administrativo e de Direção',
-    hint:        'Área restrita. Acesso apenas a gestores credenciados.',
-    demoLogin:   'gestao.escola',
-    demoSenha:   'gestao123',
-    professional: true,
+    bg:       '#0b0618',
+    accent:   '#4c1d95',
+    label:    'Gestão',
+    sublabel: 'Acesso Administrativo e de Direção',
+    hint:     'Área restrita. Acesso apenas a gestores credenciados.',
+    demo:     { login: 'gestao.escola', senha: 'gestao123' },
   },
   aluno: {
-    bg:          '#052e16',
-    accent:      '#16a34a',
-    label:       'Aluno',
-    sublabel:    'Acesso para Estudantes',
-    hint:        'Bem-vindo! Entre com seu login de estudante.',
-    demoLogin:   'aluno.joao',
-    demoSenha:   'aluno123',
-    professional: false,
+    bg:       '#052e16',
+    accent:   '#16a34a',
+    label:    'Aluno',
+    sublabel: 'Acesso para Estudantes',
+    hint:     'Bem-vindo! Entre com seu login de estudante.',
+    demo:     { login: 'aluno.joao', senha: 'aluno123' },
   },
 } as const
 
-const ROLE_CARDS = [
-  { papel: 'professor' as const, icon: '🎓', desc: 'Docentes e\nEducadores',   border: '#1e3a8a' },
-  { papel: 'gestao'    as const, icon: '🏛️', desc: 'Administração\ne Direção', border: '#4c1d95' },
-  { papel: 'aluno'     as const, icon: '📖', desc: 'Alunos e\nEstudantes',     border: '#16a34a' },
+const ROLE_CARDS: { papel: Papel; icon: string; desc: string; border: string }[] = [
+  { papel: 'professor', icon: '🎓', desc: 'Docentes e\nEducadores',   border: '#1e3a8a' },
+  { papel: 'gestao',    icon: '🏛️', desc: 'Administração\ne Direção', border: '#4c1d95' },
+  { papel: 'aluno',     icon: '📖', desc: 'Alunos e\nEstudantes',     border: '#16a34a' },
 ]
 
 export default function LoginPage() {
-  const [papel, setPapel]       = useState<Papel | null>(null)
-  const [visible, setVisible]   = useState(true)
-  const [login, setLogin]       = useState('')
-  const [senha, setSenha]       = useState('')
-  const [erro, setErro]         = useState('')
-  const [loading, setLoading]   = useState(false)
-  const router = useRouter()
+  const { login: doLogin, loading, error } = useAuth()
 
-  const currentBg = papel ? THEMES[papel].bg : BG_SELECTOR
+  const [papel, setPapel]     = useState<Papel | null>(null)
+  const [visible, setVisible] = useState(true)
+  const [loginVal, setLogin]  = useState('')
+  const [senha, setSenha]     = useState('')
+
   const theme = papel ? THEMES[papel] : null
 
   function fade(fn: () => void) {
@@ -66,64 +58,37 @@ export default function LoginPage() {
   function selectRole(p: Papel) {
     fade(() => {
       setPapel(p)
-      setLogin(THEMES[p].demoLogin)
-      setSenha(THEMES[p].demoSenha)
-      setErro('')
+      setLogin(THEMES[p].demo.login)
+      setSenha(THEMES[p].demo.senha)
     })
   }
 
   function back() {
-    fade(() => {
-      setPapel(null)
-      setLogin('')
-      setSenha('')
-      setErro('')
-    })
+    fade(() => { setPapel(null); setLogin(''); setSenha('') })
   }
 
-  async function submit(e: React.FormEvent) {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setErro('')
-    setLoading(true)
-    try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ login, senha }),
-      })
-      if (res.ok) {
-        router.push('/dashboard')
-      } else {
-        const j = await res.json()
-        setErro(j.erro || 'Credenciais inválidas')
-      }
-    } catch {
-      setErro('Sem conexão com o servidor')
-    } finally {
-      setLoading(false)
-    }
+    doLogin({ login: loginVal, senha })
   }
 
   return (
     <div
-      className="min-h-screen flex flex-col items-center justify-center p-6"
-      style={{
-        background: currentBg,
-        transition: 'background-color 0.35s ease',
-      }}
+      className="min-h-screen flex flex-col items-center justify-center p-6 transition-colors duration-300"
+      style={{ background: theme?.bg ?? '#08090c' }}
     >
       <div
         className="flex flex-col items-center w-full"
         style={{
-          opacity: visible ? 1 : 0,
+          opacity:   visible ? 1 : 0,
           transform: visible ? 'translateY(0)' : 'translateY(8px)',
           transition: 'opacity 0.18s ease, transform 0.18s ease',
         }}
       >
         {!papel ? (
-          /* ── Seletor de papel ── */
+          /* ── Seleção de perfil ── */
           <>
-            <div className="mb-12 text-center animate-fadeSlideDown">
+            <div className="mb-12 text-center">
               <p className="text-white/30 text-xs font-semibold uppercase tracking-[0.2em] mb-3">
                 Portal Escolar
               </p>
@@ -132,31 +97,28 @@ export default function LoginPage() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 w-full max-w-2xl">
-              {ROLE_CARDS.map(({ papel: p, icon, desc, border }, idx) => (
+              {ROLE_CARDS.map(({ papel: p, icon, desc, border }) => (
                 <button
                   key={p}
                   onClick={() => selectRole(p)}
                   className="flex-1 flex flex-col items-center gap-4 px-6 py-8 rounded-2xl
-                             text-white transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]
-                             animate-fadeSlideUp"
+                             text-white transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
                   style={{
                     background: 'rgba(255,255,255,0.04)',
                     border: '1px solid rgba(255,255,255,0.08)',
-                    // Stagger de entrada: 0ms, 80ms, 160ms
-                    animationDelay: `${idx * 80}ms`,
                   }}
                   onMouseEnter={e => {
-                    const el = e.currentTarget as HTMLButtonElement
+                    const el = e.currentTarget
                     el.style.borderColor = border
                     el.style.background  = `${border}22`
                   }}
                   onMouseLeave={e => {
-                    const el = e.currentTarget as HTMLButtonElement
+                    const el = e.currentTarget
                     el.style.borderColor = 'rgba(255,255,255,0.08)'
                     el.style.background  = 'rgba(255,255,255,0.04)'
                   }}
                 >
-                  <span className="text-4xl">{icon}</span>
+                  <span className="text-4xl" aria-hidden="true">{icon}</span>
                   <div className="text-center">
                     <div className="font-bold text-base" style={{ color: border }}>
                       {p === 'professor' ? 'Professor' : p === 'gestao' ? 'Gestão' : 'Aluno'}
@@ -175,45 +137,28 @@ export default function LoginPage() {
               ))}
             </div>
 
-            <p className="text-white/20 text-xs mt-12">
-              EduCalendário — Portal de Comunicação Escolar
-            </p>
+            <p className="text-white/20 text-xs mt-12">EduCalendário — Portal de Comunicação Escolar</p>
           </>
         ) : (
-          /* ── Formulário temático ── */
-          <div className="w-full max-w-sm animate-fadeSlideUp">
+          /* ── Formulário ── */
+          <div className="w-full max-w-sm">
             <button
               onClick={back}
-              className="flex items-center gap-2 mb-8 text-sm transition-colors"
-              style={{ color: 'rgba(255,255,255,0.4)', minHeight: '44px' }}
-              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.9)' }}
-              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = 'rgba(255,255,255,0.4)' }}
+              className="flex items-center gap-2 mb-8 text-sm text-white/40 hover:text-white/90
+                         transition-colors"
+              style={{ minHeight: '44px' }}
             >
               ← Trocar perfil
             </button>
 
             <div className="mb-7">
-              {!theme!.professional && (
-                <span className="text-3xl block mb-3">📖</span>
-              )}
-              <h1
-                className="font-black tracking-tight text-white"
-                style={{
-                  fontSize: theme!.professional ? '1.75rem' : '1.5rem',
-                  lineHeight: 1.15,
-                }}
-              >
-                {theme!.professional ? 'EduCalendário' : 'Olá, Estudante!'}
+              <h1 className="text-[1.75rem] font-black tracking-tight text-white leading-tight">
+                EduCalendário
               </h1>
-              <p className="mt-1.5 text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                {theme!.sublabel}
-              </p>
+              <p className="mt-1.5 text-sm text-white/40">{theme!.sublabel}</p>
             </div>
 
-            <div
-              className="rounded-2xl p-7 bg-white"
-              style={{ boxShadow: '0 24px 64px rgba(0,0,0,0.6)' }}
-            >
+            <div className="rounded-2xl p-7 bg-white shadow-[0_24px_64px_rgba(0,0,0,0.6)]">
               <div className="flex items-center gap-2 mb-6">
                 <div className="w-1 h-5 rounded-full" style={{ background: theme!.accent }} />
                 <span className="text-xs font-bold uppercase tracking-widest text-slate-400">
@@ -221,11 +166,10 @@ export default function LoginPage() {
                 </span>
               </div>
 
-              <form onSubmit={submit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">Login</label>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <Field label="Login">
                   <input
-                    value={login}
+                    value={loginVal}
                     onChange={e => setLogin(e.target.value)}
                     required
                     autoFocus
@@ -233,10 +177,9 @@ export default function LoginPage() {
                                focus:outline-none focus:ring-2 transition-all"
                     style={{ '--tw-ring-color': theme!.accent } as React.CSSProperties}
                   />
-                </div>
+                </Field>
 
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">Senha</label>
+                <Field label="Senha">
                   <input
                     type="password"
                     value={senha}
@@ -247,20 +190,19 @@ export default function LoginPage() {
                                focus:outline-none focus:ring-2 transition-all"
                     style={{ '--tw-ring-color': theme!.accent } as React.CSSProperties}
                   />
-                </div>
+                </Field>
 
-                {erro && (
-                  <div className="bg-red-50 border border-red-200 text-red-700 text-xs px-4 py-3 rounded-lg animate-shake">
-                    {erro}
+                {error && (
+                  <div className="bg-red-50 border border-red-200 text-red-700 text-xs px-4 py-3 rounded-lg">
+                    {error}
                   </div>
                 )}
 
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3 rounded-lg font-bold text-white text-sm
-                             transition-all mt-2 disabled:opacity-60
-                             flex items-center justify-center gap-2"
+                  className="w-full py-3 rounded-lg font-bold text-white text-sm mt-2
+                             transition-all disabled:opacity-60 flex items-center justify-center gap-2"
                   style={{ background: loading ? '#94a3b8' : theme!.accent, minHeight: '44px' }}
                 >
                   {loading ? (
@@ -277,12 +219,19 @@ export default function LoginPage() {
               <p className="text-xs text-slate-400 mt-5 leading-relaxed">{theme!.hint}</p>
             </div>
 
-            <p className="text-center text-xs mt-6" style={{ color: 'rgba(255,255,255,0.2)' }}>
-              EduCalendário — Portal Escolar
-            </p>
+            <p className="text-center text-xs mt-6 text-white/20">EduCalendário — Portal Escolar</p>
           </div>
         )}
       </div>
+    </div>
+  )
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <label className="block text-sm font-semibold text-slate-700 mb-1.5">{label}</label>
+      {children}
     </div>
   )
 }

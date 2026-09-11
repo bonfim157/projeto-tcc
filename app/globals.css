@@ -1,115 +1,41 @@
 @import 'tailwindcss';
 
 /* ============================================
-   🏫 DESIGN SYSTEM INSTITUCIONAL - EduCalendário
+   EduCalendário — Design System
+   Variáveis, animações e estilos globais
    ============================================ */
 
-@theme {
-  /* 🎨 TOKENS DO SISTEMA DE DESIGN (gerados pelo ThemeProvider) */
-  /* As variáveis CSS serão injetadas dinamicamente pelo ThemeProvider */
-  
-  /* 🎪 SOMBRAS PROFISSIONAIS */
-  --shadow-card:   0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-modal:  0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-  --shadow-lg:     0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --shadow-xl:     0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-  
-  /* 📐 BORDER RADIUS CONSISTENTE */
-  --radius-sm:     4px;
-  --radius-base:   8px;
-  --radius-md:     12px;
-  --radius-lg:     16px;
-  --radius-xl:     24px;
-  --radius-2xl:    32px;
-  --radius-3xl:    48px;
-  --radius-full:   9999px;
-  
-  /* 🎬 ANIMAÇÕES PROFISSIONAIS */
-  --animation-duration-fastest: 75ms;
-  --animation-duration-faster:  100ms;
-  --animation-duration-fast:    150ms;
-  --animation-duration-base:    200ms;
-  --animation-duration-slow:    300ms;
-  --animation-duration-slower:  500ms;
-  --animation-duration-slowest: 700ms;
-  
-  --animation-timing-linear: linear;
-  --animation-timing-ease: ease;
-  --animation-timing-ease-in: ease-in;
-  --animation-timing-ease-out: ease-out;
-  --animation-timing-ease-in-out: ease-in-out;
-  --animation-timing-material: cubic-bezier(0.4, 0, 0.2, 1);
-  
-  /* 📱 BREAKPOINTS MOBILE-FIRST */
-  --breakpoint-xs: 320px;
-  --breakpoint-sm: 640px;
-  --breakpoint-md: 768px;
-  --breakpoint-lg: 1024px;
-  --breakpoint-xl: 1280px;
-  --breakpoint-2xl: 1536px;
-}
-
-/* ============================================
-   🎯 VARIÁVEIS DE COMPATIBILIDADE (para código existente)
-   ============================================ */
-
-/* ── Accent padrão (fallback antes do login) ── */
+/* ── Variáveis CSS base ──────────────────────── */
 :root {
-  --accent:       var(--edu-primary, #1E40AF);
-  --accent-light: var(--edu-primary-100, #DBEAFE);
+  /* Accent padrão (sobrescrito por [data-role]) */
+  --accent:       #1E40AF;
+  --accent-light: #DBEAFE;
   --accent-muted: rgba(30, 64, 175, 0.12);
-  
-  --color-bg:            var(--edu-background, #F8FAFC);
-  --color-surface:       var(--edu-card, #FFFFFF);
-  --color-border:        var(--edu-border, #E2E8F0);
-  --color-text:          var(--edu-foreground, #1E293B);
-  --color-muted:         var(--edu-muted-foreground, #64748B);
-  
-  --color-primary:       var(--edu-primary, #1E40AF);
-  --color-success:       var(--edu-success, #059669);
-  --color-danger:        var(--edu-destructive, #DC2626);
-  --color-warning:       var(--edu-warning, #D97706);
+
+  /* Sombras */
+  --shadow-card:  0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-modal: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
 }
 
-/* ── Professor (Azul Institucional) ── */
+/* ── Tema por papel ──────────────────────────── */
 [data-role="professor"] {
-  --accent:       var(--color-profile-professor, #1E40AF);
-  --accent-light: var(--edu-primary-100, #DBEAFE);
+  --accent:       #1E40AF;
+  --accent-light: #DBEAFE;
   --accent-muted: rgba(30, 64, 175, 0.10);
 }
-
-/* ── Gestão (Roxo Autoridade) ── */
 [data-role="gestao"] {
-  --accent:       var(--color-profile-gestao, #7C3AED);
+  --accent:       #7C3AED;
   --accent-light: #EDE9FE;
   --accent-muted: rgba(124, 58, 237, 0.10);
 }
-
-/* ── Aluno (Verde Profissional) ── */
 [data-role="aluno"] {
-  --accent:       var(--color-profile-aluno, #059669);
+  --accent:       #059669;
   --accent-light: #DCFCE7;
   --accent-muted: rgba(5, 150, 105, 0.10);
 }
 
-/* ============================================
-   🌙 SUPORTE A TEMA ESCURO
-   ============================================ */
-
-.dark {
-  /* Sobrescrever variáveis de compatibilidade para tema escuro */
-  --color-bg:            var(--edu-background, #020617);
-  --color-surface:       var(--edu-card, #0F172A);
-  --color-border:        var(--edu-border, #1E293B);
-  --color-text:          var(--edu-foreground, #F8FAFC);
-  --color-muted:         var(--edu-muted-foreground, #94A3B8);
-}
-
-/* ============================================
-   🛠️ ESTILOS GLOBAIS E RESETS
-   ============================================ */
-
-* {
+/* ── Resets ──────────────────────────────────── */
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -117,401 +43,113 @@
 
 html, body {
   height: 100%;
-  background: var(--color-bg);
-  color: var(--color-text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-feature-settings: 'cv11', 'ss01';
-  transition: background-color 200ms var(--animation-timing-material),
-              color 200ms var(--animation-timing-material);
-}
-
-body {
-  font-family: var(--edu-font-family, 'Inter', 'Nunito Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
-  line-height: 1.5;
   overflow-x: hidden;
 }
-
-/* ============================================
-   🎯 CLASSES UTILITÁRIAS
-   ============================================ */
-
-.container {
-  width: 100%;
-  margin: 0 auto;
-  padding: 0 1rem;
-}
-
-@media (min-width: 640px) {
-  .container {
-    max-width: 640px;
-    padding: 0 1.5rem;
-  }
-}
-
-@media (min-width: 768px) {
-  .container {
-    max-width: 768px;
-  }
-}
-
-@media (min-width: 1024px) {
-  .container {
-    max-width: 1024px;
-    padding: 0 2rem;
-  }
-}
-
-@media (min-width: 1280px) {
-  .container {
-    max-width: 1280px;
-  }
-}
-
-@media (min-width: 1536px) {
-  .container {
-    max-width: 1536px;
-  }
-}
-
-/* ============================================
-   🎨 ELEMENTOS DE FORMULÁRIO
-   ============================================ */
 
 input, textarea, select, button {
   font-family: inherit;
   font-size: inherit;
-  line-height: inherit;
-  color: inherit;
 }
 
-input:focus, textarea:focus, select:focus, button:focus {
-  outline: 2px solid var(--edu-ring, #3B82F6);
-  outline-offset: 2px;
+/* Previne zoom automático em inputs no iOS */
+@media screen and (max-width: 768px) {
+  input, textarea, select { font-size: 16px; }
 }
 
-input:disabled, textarea:disabled, select:disabled, button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+/* Touch targets mínimos (acessibilidade) */
+@media (pointer: coarse) {
+  button, a { min-height: 44px; min-width: 44px; }
 }
 
-/* ============================================
-   🔗 LINKS E INTERATIVIDADE
-   ============================================ */
+/* ── Scrollbar personalizada ─────────────────── */
+::-webkit-scrollbar           { width: 6px; height: 6px; }
+::-webkit-scrollbar-track     { background: transparent; }
+::-webkit-scrollbar-thumb     { background: #cbd5e1; border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-a {
-  color: var(--edu-primary, #1E40AF);
-  text-decoration: none;
-  transition: color 150ms var(--animation-timing-material);
-}
+/* ── Seleção de texto ────────────────────────── */
+::selection { background: var(--accent); color: white; }
 
-a:hover {
-  color: var(--edu-primary-600, #2563EB);
-  text-decoration: underline;
-}
-
-button {
-  cursor: pointer;
-  background: none;
-  border: none;
-  font: inherit;
-  transition: all 150ms var(--animation-timing-material);
-}
-
-/* ============================================
-   📜 SCROLLBAR PERSONALIZADO
-   ============================================ */
-
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--edu-muted, #F1F5F9);
-  border-radius: var(--radius-full, 9999px);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--edu-border, #E2E8F0);
-  border-radius: var(--radius-full, 9999px);
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--edu-muted-foreground, #94A3B8);
-}
-
-.dark ::-webkit-scrollbar-track {
-  background: var(--edu-muted, #1E293B);
-}
-
-.dark ::-webkit-scrollbar-thumb {
-  background: var(--edu-border, #334155);
-}
-
-.dark ::-webkit-scrollbar-thumb:hover {
-  background: var(--edu-muted-foreground, #64748B);
-}
-
-/* ============================================
-   🎬 SISTEMA DE ANIMAÇÕES PROFISSIONAIS
-   ============================================ */
-
-/* ── Keyframes ── */
-
-/* Fade simples */
+/* ── Keyframes ───────────────────────────────── */
 @keyframes fadeIn {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
-
-@keyframes fadeOut {
-  from { opacity: 1; }
-  to   { opacity: 0; }
-}
-
-/* Fade + slide (conteúdo principal, modais) */
 @keyframes fadeSlideUp {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
-
 @keyframes fadeSlideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
-
-/* Drawer mobile (slide da esquerda) */
 @keyframes slideInLeft {
-  from {
-    opacity: 0.6;
-    transform: translateX(-100%);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+  from { opacity: 0.6; transform: translateX(-100%); }
+  to   { opacity: 1;   transform: translateX(0); }
 }
-
-@keyframes slideOutLeft {
-  from {
-    opacity: 1;
-    transform: translateX(0);
-  }
-  to {
-    opacity: 0.6;
-    transform: translateX(-100%);
-  }
-}
-
-/* Bottom sheet (mobile) */
 @keyframes slideInUp {
-  from {
-    opacity: 0.6;
-    transform: translateY(100%);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0.6; transform: translateY(100%); }
+  to   { opacity: 1;   transform: translateY(0); }
 }
-
-/* Entrada escalonada de itens de lista */
-@keyframes staggerFadeIn {
-  from {
-    opacity: 0;
-    transform: translateX(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-/* Skeleton loading */
 @keyframes shimmer {
   0%   { background-position: -200% 0; }
   100% { background-position:  200% 0; }
 }
-
-/* Bounce sutil de confirmação */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-6px); }
+  40%       { transform: translateX(6px); }
+  60%       { transform: translateX(-4px); }
+  80%       { transform: translateX(4px); }
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
 @keyframes bounceSlight {
   0%, 100% { transform: scale(1); }
   50%       { transform: scale(1.06); }
 }
-
-/* Pulso de atenção (ícone ativo) */
-@keyframes pulseSlight {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.7; }
+@keyframes staggerFadeIn {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
 
-/* Shake de erro em formulário */
-@keyframes shake {
-  0%, 100%  { transform: translateX(0); }
-  20%        { transform: translateX(-6px); }
-  40%        { transform: translateX(6px); }
-  60%        { transform: translateX(-4px); }
-  80%        { transform: translateX(4px); }
-}
-
-/* Rotação contínua (spinner de loading) */
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
-
-/* ── Classes utilitárias de animação ── */
-
-.animate-fadeIn {
-  animation: fadeIn var(--animation-duration-fast, 150ms) var(--animation-timing-material, cubic-bezier(0.4,0,0.2,1)) both;
-}
-
-.animate-fadeSlideUp {
-  animation: fadeSlideUp var(--animation-duration-slow, 300ms) var(--animation-timing-material, cubic-bezier(0.4,0,0.2,1)) both;
-}
-
-.animate-fadeSlideDown {
-  animation: fadeSlideDown var(--animation-duration-slow, 300ms) var(--animation-timing-material, cubic-bezier(0.4,0,0.2,1)) both;
-}
-
-.animate-slideInLeft {
-  animation: slideInLeft var(--animation-duration-slow, 300ms) var(--animation-timing-material, cubic-bezier(0.4,0,0.2,1)) both;
-}
-
-.animate-slideInUp {
-  animation: slideInUp var(--animation-duration-slow, 300ms) var(--animation-timing-material, cubic-bezier(0.4,0,0.2,1)) both;
-}
-
-.animate-stagger {
-  animation: staggerFadeIn var(--animation-duration-slow, 300ms) var(--animation-timing-material, cubic-bezier(0.4,0,0.2,1)) both;
-}
+/* ── Classes de animação ─────────────────────── */
+.animate-fadeIn       { animation: fadeIn       150ms cubic-bezier(0.4,0,0.2,1) both; }
+.animate-fadeSlideUp  { animation: fadeSlideUp  300ms cubic-bezier(0.4,0,0.2,1) both; }
+.animate-fadeSlideDown{ animation: fadeSlideDown 300ms cubic-bezier(0.4,0,0.2,1) both; }
+.animate-slideInLeft  { animation: slideInLeft  300ms cubic-bezier(0.4,0,0.2,1) both; }
+.animate-slideInUp    { animation: slideInUp    300ms cubic-bezier(0.4,0,0.2,1) both; }
+.animate-shake        { animation: shake        400ms ease-in-out; }
+.animate-spin         { animation: spin         700ms linear infinite; }
+.animate-bounce-slight{ animation: bounceSlight 200ms cubic-bezier(0.4,0,0.2,1); }
+.animate-stagger      { animation: staggerFadeIn 300ms cubic-bezier(0.4,0,0.2,1) both; }
 
 .animate-shimmer {
-  background: linear-gradient(90deg, var(--edu-muted, #F1F5F9) 25%, rgba(255,255,255,0.6) 50%, var(--edu-muted, #F1F5F9) 75%);
+  background: linear-gradient(90deg, #f1f5f9 25%, rgba(255,255,255,0.6) 50%, #f1f5f9 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
 
-.animate-bounce-slight {
-  animation: bounceSlight 200ms var(--animation-timing-material, cubic-bezier(0.4,0,0.2,1));
-}
+/* Transition timing utilitário */
+.ease-material { transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
 
-.animate-shake {
-  animation: shake 400ms var(--animation-timing-ease-in-out, ease-in-out);
-}
-
-/* Spinner para botões de loading */
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
-
-.animate-spin {
-  animation: spin 700ms linear infinite;
-}
-
-/* Timing util: ease tipo Material Design */
-.ease-material {
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* ── Stagger de filhos com CSS delay ── */
-.stagger-children > *:nth-child(1) { animation-delay: 0ms; }
-.stagger-children > *:nth-child(2) { animation-delay: 50ms; }
+/* Stagger de filhos */
+.stagger-children > *:nth-child(1) { animation-delay:   0ms; }
+.stagger-children > *:nth-child(2) { animation-delay:  50ms; }
 .stagger-children > *:nth-child(3) { animation-delay: 100ms; }
 .stagger-children > *:nth-child(4) { animation-delay: 150ms; }
 .stagger-children > *:nth-child(5) { animation-delay: 200ms; }
 .stagger-children > *:nth-child(6) { animation-delay: 250ms; }
 
-/* ── Skeleton screen ── */
-.skeleton {
-  border-radius: var(--radius-base, 8px);
-  overflow: hidden;
-}
-.skeleton::after {
-  content: '';
-  display: block;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent 25%, rgba(255,255,255,0.5) 50%, transparent 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-}
-
-/* ============================================
-   🎪 ESTADOS DE REDUCED MOTION
-   ============================================ */
-
+/* ── Reduced motion ──────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
   }
 }
-
-/* ============================================
-   🎯 SELEÇÃO DE TEXTO
-   ============================================ */
-
-::selection {
-  background-color: var(--edu-primary, #1E40AF);
-  color: white;
-}
-
-/* ============================================
-   📱 UTILITÁRIOS PARA MOBILE
-   ============================================ */
-
-/* Prevenir zoom em inputs no iOS */
-@media screen and (max-width: 768px) {
-  input, textarea, select {
-    font-size: 16px; /* Evita zoom automático no iOS */
-  }
-}
-
-/* Touch targets mínimos para acessibilidade */
-@media (pointer: coarse) {
-  button, 
-  a, 
-  input[type="checkbox"], 
-  input[type="radio"] {
-    min-height: 44px;
-    min-width: 44px;
-  }
-}
-
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-html, body {
-  height: 100%;
-  background: var(--color-bg);
-  color: var(--color-text);
-  -webkit-font-smoothing: antialiased;
-}
-
-a { color: inherit; text-decoration: none; }
-
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }

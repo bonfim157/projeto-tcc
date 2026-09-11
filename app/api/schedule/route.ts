@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server'
-import { isConfigured, supabase } from '@/lib/supabase'
+import { isConfigured, db } from '@/lib/supabase'
 import getDB from '@/lib/db'
 
 export async function GET() {
   if (isConfigured) {
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('schedules')
       .select('*')
       .order('dia', { ascending: true })
@@ -13,8 +13,8 @@ export async function GET() {
     return NextResponse.json({ schedules: data ?? [] })
   }
 
-  const db = await getDB()
-  const schedules = ((db.data!.schedules as any[]) ?? [])
+  const local = await getDB()
+  const schedules = (local.data.schedules ?? [])
     .sort((a, b) => a.dia - b.dia || a.slot - b.slot)
   return NextResponse.json({ schedules })
 }

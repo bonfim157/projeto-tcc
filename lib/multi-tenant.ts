@@ -4,7 +4,7 @@
  * Funções e tipos para trabalhar com arquitetura multi-tenant
  */
 
-import { isConfigured, supabase } from './supabase'
+import { isConfigured, db as supabase } from './supabase'
 import getDB from './db'
 
 // ============================================
@@ -448,9 +448,9 @@ export async function criarEventoCalendario(
       date: evento.data,
       title: evento.titulo,
       category: evento.categoria,
-      status: evento.status || 'pending',
-      nota: evento.descricao,
-      autor_login: evento.autor_id,
+      status: (evento.status || 'pending') as 'approved' | 'rejected' | 'pending',
+      nota: evento.descricao ?? null,
+      autor_login: evento.autor_id ?? null,
     })
     
     await db.write()

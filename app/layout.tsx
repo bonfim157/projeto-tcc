@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import { Nunito } from 'next/font/google'
-import { ThemeProvider } from '@/lib/theme-provider'
 import './globals.css'
 
 const nunito = Nunito({
@@ -11,17 +10,15 @@ const nunito = Nunito({
 })
 
 export const metadata: Metadata = {
-  title: 'EduCalendário - Plataforma Educacional Multi-Tenant',
-  description: 'Sistema unificado de calendário escolar, comunicação e gestão educacional',
+  title: 'EduCalendário — Portal Escolar',
+  description: 'Sistema de calendário escolar, comunicação e gestão educacional',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-BR" className={`${nunito.variable} font-sans`} suppressHydrationWarning>
-      <body className="min-h-screen antialiased">
-        <ThemeProvider>
-          {children}
-        </ThemeProvider>
+      <body className="min-h-screen bg-slate-50 text-slate-900 antialiased">
+        {children}
       </body>
     </html>
   )

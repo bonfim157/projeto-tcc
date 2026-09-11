@@ -1,23 +1,23 @@
 import { NextResponse } from 'next/server'
-import { isConfigured, supabase } from '@/lib/supabase'
+import { isConfigured, db } from '@/lib/supabase'
 import { EventSchema } from '@/lib/validation'
-import getDB from '@/lib/db'
+import getDB, { type DBEvent } from '@/lib/db'
 
-function normalizeEvent(ev: any) {
+function normalizeEvent(ev: DBEvent) {
   return {
     id:          ev.id,
     date:        ev.date,
     title:       ev.title,
-    category:    ev.category ?? ev.cat ?? 'blue',
+    category:    ev.category ?? 'blue',
     status:      ev.status ?? 'pending',
     nota:        ev.nota ?? null,
-    autor_login: ev.autor_login ?? ev.autor ?? null,
+    autor_login: ev.autor_login ?? null,
   }
 }
 
 export async function GET() {
   if (isConfigured) {
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('events')
       .select('*')
       .order('date', { ascending: true })
@@ -25,9 +25,8 @@ export async function GET() {
     return NextResponse.json({ events: data ?? [] })
   }
 
-  const db = await getDB()
-  const events = ((db.data!.events as any[]) ?? [])
-    .map(normalizeEvent)
+  const local = await getDB()
+  const events = (local.data.events ?? []).map(normalizeEvent)
     .sort((a, b) => a.date.localeCompare(b.date))
   return NextResponse.json({ events })
 }
@@ -39,14 +38,14 @@ export async function POST(req: Request) {
     if (!parsed.success) {
       return NextResponse.json(
         { erro: 'Dados inválidos', detalhes: parsed.error.flatten() },
-        { status: 400 }
+        { status: 400 },
       )
     }
 
     const { date, title, category, nota, autor_login } = parsed.data
 
     if (isConfigured) {
-      const { data, error } = await supabase
+      const { data, error } = await db
         .from('events')
         .insert({ date, title, category, nota: nota ?? null, autor_login: autor_login ?? null, status: 'pending' })
         .select()
@@ -55,16 +54,16 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: true, event: data })
     }
 
-    const db = await getDB()
+    const local = await getDB()
     const newEvent = {
       id: crypto.randomUUID(),
       date, title, category,
       nota: nota ?? null,
       autor_login: autor_login ?? null,
-      status: 'pending',
+      status: 'pending' as const,
     }
-    ;(db.data!.events as any[]).push(newEvent)
-    await db.write()
+    local.data.events.push(newEvent)
+    await local.write()
     return NextResponse.json({ ok: true, event: newEvent })
   } catch {
     return NextResponse.json({ erro: 'Erro ao criar evento' }, { status: 500 })
